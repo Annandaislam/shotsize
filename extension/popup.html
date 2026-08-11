@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>ShotSize</title>
+<link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <h1>ShotSize</h1>
+
+  <label for="size">Size (width &times; height)</label>
+  <input type="text" id="size" placeholder="1920x1080" value="1920x1080" spellcheck="false">
+  <div class="presets" id="presets"></div>
+
+  <div class="row">
+    <div>
+      <label for="format">Format</label>
+      <select id="format">
+        <option value="png">PNG</option>
+        <option value="jpeg">JPEG</option>
+      </select>
+    </div>
+    <div>
+      <label for="delay">Delay (ms)</label>
+      <input type="number" id="delay" value="0" min="0" max="10000" step="250">
+    </div>
+  </div>
+
+  <div class="checks">
+    <label><input type="checkbox" id="scale2"> Retina 2&times;</label>
+    <label><input type="checkbox" id="banners" checked> Hide cookie banners</label>
+    <label><input type="checkbox" id="full"> Full page (ignore height)</label>
+    <label><input type="checkbox" id="autosave" checked> Save to Downloads automatically</label>
+  </div>
+
+  <button id="go">Capture this tab</button>
+
+  <p id="status" class="status"></p>
+  <div id="result" class="result" hidden>
+    <img id="preview" alt="Captured screenshot">
+    <div class="meta">
+      <span id="dims"></span>
+      <a id="save" download>Save as…</a>
+    </div>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>

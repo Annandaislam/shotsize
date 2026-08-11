@@ -1,0 +1,204 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>shotsize</title>
+<style>
+  :root {
+    color-scheme: light dark;
+    --bg: #fbfbfa; --panel: #fff; --ink: #16150f; --muted: #6b6a63;
+    --line: #e4e3dd; --accent: #c15f3c; --accent-ink: #fff; --field: #fff;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg:#191917; --panel:#232320; --ink:#f2f1ec; --muted:#9d9c93;
+            --line:#35342f; --field:#1c1c1a; }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--ink);
+    font: 15px/1.5 ui-sans-serif, -apple-system, "Segoe UI", system-ui, sans-serif;
+  }
+  .wrap { max-width: 1180px; margin: 0 auto; padding: 32px 24px 64px; }
+  header { margin-bottom: 28px; }
+  h1 { font-size: 22px; margin: 0 0 4px; letter-spacing: -0.02em; }
+  .sub { color: var(--muted); font-size: 14px; margin: 0; }
+  .layout { display: grid; gap: 24px; grid-template-columns: 340px minmax(0, 1fr); align-items: start; }
+  @media (max-width: 860px) { .layout { grid-template-columns: 1fr; } }
+
+  .card { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 20px; }
+  label { display: block; font-size: 12px; font-weight: 600; letter-spacing: .04em;
+          text-transform: uppercase; color: var(--muted); margin: 0 0 6px; }
+  .field + .field { margin-top: 16px; }
+  input[type=text], input[type=number], select {
+    width: 100%; padding: 9px 11px; border: 1px solid var(--line); border-radius: 8px;
+    background: var(--field); color: var(--ink); font: inherit; font-size: 14px;
+  }
+  input:focus, select:focus { outline: 2px solid var(--accent); outline-offset: -1px; border-color: transparent; }
+  .row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .presets { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+  .presets button {
+    font: inherit; font-size: 12px; padding: 4px 9px; border-radius: 999px; cursor: pointer;
+    border: 1px solid var(--line); background: transparent; color: var(--muted);
+  }
+  .presets button:hover { border-color: var(--accent); color: var(--accent); }
+  .checks { margin-top: 16px; display: grid; gap: 9px; }
+  .checks label { display: flex; gap: 8px; align-items: center; text-transform: none;
+                  letter-spacing: 0; font-size: 14px; font-weight: 400; color: var(--ink); margin: 0; }
+  .checks input { accent-color: var(--accent); width: 16px; height: 16px; }
+  #go {
+    margin-top: 22px; width: 100%; padding: 11px; border: 0; border-radius: 8px; cursor: pointer;
+    background: var(--accent); color: var(--accent-ink); font: inherit; font-weight: 600; font-size: 15px;
+  }
+  #go:disabled { opacity: .55; cursor: progress; }
+
+  .stage { min-height: 320px; display: grid; place-items: center; text-align: center; }
+  .stage .hint { color: var(--muted); font-size: 14px; }
+  .shot { display: block; max-width: 100%; max-height: 62vh; border: 1px solid var(--line); border-radius: 6px; }
+  .meta { display: flex; flex-wrap: wrap; gap: 8px 18px; align-items: center;
+          margin-top: 14px; font-size: 13px; color: var(--muted); }
+  .meta strong { color: var(--ink); font-weight: 600; }
+  .meta a { color: var(--accent); font-weight: 600; text-decoration: none; }
+  .meta a:hover { text-decoration: underline; }
+  code { font-family: ui-monospace, "Cascadia Code", Consolas, monospace; font-size: 12.5px;
+         background: var(--field); border: 1px solid var(--line); border-radius: 5px; padding: 1px 5px; }
+  .err { color: #c0392b; font-size: 14px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>shotsize</h1>
+    <p class="sub">Capture any page at an exact pixel box. Type a size, get a file that size.</p>
+  </header>
+
+  <div class="layout">
+    <form class="card" id="form">
+      <div class="field">
+        <label for="url">URL</label>
+        <input type="text" id="url" placeholder="example.com" value="example.com" required>
+      </div>
+
+      <div class="field">
+        <label for="size">Size (width &times; height)</label>
+        <input type="text" id="size" placeholder="1920x1080" value="1920x1080"
+               pattern="\s*\d{1,5}\s*[xX*]\s*\d{1,5}\s*" required>
+        <div class="presets" id="presets"></div>
+      </div>
+
+      <div class="field row">
+        <div>
+          <label for="format">Format</label>
+          <select id="format">
+            <option value="png">PNG</option>
+            <option value="jpeg">JPEG</option>
+            <option value="webp">WebP</option>
+          </select>
+        </div>
+        <div>
+          <label for="delay">Delay (ms)</label>
+          <input type="number" id="delay" value="0" min="0" max="15000" step="250">
+        </div>
+      </div>
+
+      <div class="checks">
+        <label><input type="checkbox" id="scale2"> Retina 2&times; (doubles output pixels)</label>
+        <label><input type="checkbox" id="banners" checked> Hide cookie / consent overlays</label>
+        <label><input type="checkbox" id="full"> Full page instead of exact box</label>
+      </div>
+
+      <button id="go" type="submit">Capture</button>
+    </form>
+
+    <div class="card">
+      <div class="stage" id="stage">
+        <p class="hint">Your screenshot will appear here.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const PRESETS = ['1920x1080','1920x1920','1440x900','1366x768','1280x720','1200x1200','1080x1350','390x844'];
+const $ = (id) => document.getElementById(id);
+const stage = $('stage');
+
+$('presets').innerHTML = PRESETS
+  .map((p) => `<button type="button" data-size="${p}">${p}</button>`).join('');
+$('presets').addEventListener('click', (e) => {
+  const b = e.target.closest('button[data-size]');
+  if (b) $('size').value = b.dataset.size;
+});
+
+$('form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const btn = $('go');
+  btn.disabled = true;
+  btn.textContent = 'Capturing…';
+  stage.innerHTML = '<p class="hint">Loading the page and rendering…</p>';
+
+  try {
+    const res = await fetch('/api/capture', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({
+        url: $('url').value,
+        size: $('size').value,
+        format: $('format').value,
+        delay: Number($('delay').value) || 0,
+        scale: $('scale2').checked ? 2 : 1,
+        hideCookieBanners: $('banners').checked,
+        fullPage: $('full').checked,
+      }),
+    });
+    const data = await res.json();
+    if (!data.ok) throw new Error(data.error);
+
+    // Build with DOM APIs, not innerHTML: file names and paths come from the
+    // page being captured, so they must never be parsed as markup.
+    const kb = (data.bytes / 1024).toFixed(0);
+    const wrap = document.createElement('div');
+
+    const img = document.createElement('img');
+    img.className = 'shot';
+    img.src = data.dataUrl;
+    img.alt = `Screenshot of ${data.name}`;
+    wrap.appendChild(img);
+
+    const meta = document.createElement('div');
+    meta.className = 'meta';
+
+    const dims = document.createElement('span');
+    const strong = document.createElement('strong');
+    strong.textContent = `${data.width}×${data.height}`;
+    dims.append(strong, ' px');
+
+    const size = document.createElement('span');
+    size.textContent = `${kb} KB`;
+
+    const dl = document.createElement('a');
+    dl.href = data.dataUrl;
+    dl.download = data.name;
+    dl.textContent = 'Download';
+
+    const saved = document.createElement('span');
+    const code = document.createElement('code');
+    code.textContent = data.file;
+    saved.append('saved to ', code);
+
+    meta.append(dims, size, dl, saved);
+    wrap.appendChild(meta);
+    stage.replaceChildren(wrap);
+  } catch (err) {
+    const p = document.createElement('p');
+    p.className = 'err';
+    p.textContent = err.message;
+    stage.replaceChildren(p);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Capture';
+  }
+});
+</script>
+</body>
+</html>

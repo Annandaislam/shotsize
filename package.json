@@ -1,0 +1,22 @@
+{
+  "name": "shotsize",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Capture website screenshots at exact pixel dimensions",
+  "type": "module",
+  "bin": {
+    "shotsize": "src/cli.js"
+  },
+  "scripts": {
+    "shot": "node src/cli.js",
+    "ui": "node src/server.js",
+    "test": "node test/cdp-path.test.js",
+    "test:security": "node test/security.test.js",
+    "icons": "node src/make-icons.js",
+    "package": "node src/package-extension.js",
+    "postinstall": "playwright install chromium"
+  },
+  "dependencies": {
+    "playwright": "^1.49.0"
+  }
+}

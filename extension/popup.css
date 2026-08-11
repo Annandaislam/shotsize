@@ -1,0 +1,45 @@
+:root {
+  color-scheme: light dark;
+  --bg: #fbfbfa; --ink: #16150f; --muted: #6b6a63;
+  --line: #e4e3dd; --accent: #c15f3c; --field: #fff;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --bg:#1f1f1d; --ink:#f2f1ec; --muted:#9d9c93; --line:#37362f; --field:#171716; }
+}
+* { box-sizing: border-box; }
+body {
+  width: 320px; margin: 0; padding: 16px; background: var(--bg); color: var(--ink);
+  font: 14px/1.45 ui-sans-serif, "Segoe UI", system-ui, sans-serif;
+}
+h1 { font-size: 15px; margin: 0 0 14px; letter-spacing: -0.01em; }
+label { display: block; font-size: 11px; font-weight: 600; letter-spacing: .05em;
+        text-transform: uppercase; color: var(--muted); margin: 0 0 5px; }
+input[type=text], input[type=number], select {
+  width: 100%; padding: 7px 9px; border: 1px solid var(--line); border-radius: 7px;
+  background: var(--field); color: var(--ink); font: inherit; font-size: 13px;
+}
+input:focus, select:focus { outline: 2px solid var(--accent); outline-offset: -1px; }
+.presets { display: flex; flex-wrap: wrap; gap: 5px; margin: 7px 0 14px; }
+.presets button {
+  font: inherit; font-size: 11px; padding: 3px 8px; border-radius: 999px; cursor: pointer;
+  border: 1px solid var(--line); background: transparent; color: var(--muted);
+}
+.presets button:hover { border-color: var(--accent); color: var(--accent); }
+.row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.checks { margin: 14px 0 0; display: grid; gap: 7px; }
+.checks label { display: flex; gap: 7px; align-items: center; text-transform: none;
+                letter-spacing: 0; font-size: 13px; font-weight: 400; color: var(--ink); margin: 0; }
+.checks input { accent-color: var(--accent); width: 15px; height: 15px; margin: 0; }
+#go {
+  margin-top: 16px; width: 100%; padding: 10px; border: 0; border-radius: 7px; cursor: pointer;
+  background: var(--accent); color: #fff; font: inherit; font-weight: 600; font-size: 14px;
+}
+#go:disabled { opacity: .55; cursor: progress; }
+.status { margin: 10px 0 0; font-size: 12.5px; color: var(--muted); min-height: 1em; }
+.status.error { color: #d0503a; }
+.result { margin-top: 12px; }
+#preview { display: block; width: 100%; border: 1px solid var(--line); border-radius: 6px; }
+.meta { display: flex; justify-content: space-between; align-items: center;
+        margin-top: 8px; font-size: 12.5px; color: var(--muted); }
+.meta a { color: var(--accent); font-weight: 600; text-decoration: none; }
+.meta a:hover { text-decoration: underline; }
